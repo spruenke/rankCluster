@@ -256,7 +256,7 @@ nm_gen = function(nn, n_i, m_ij, each_s = F, both_s = T, identical_s = T, identi
       
     } else if(identical_c == F){
       m_small = 3
-      m_large = 40
+      m_large = 15
       if(each_s == F) other = sample(c(1:nn), 2)
       if(each_s == T) other = list(c(1:nn))
       for(i in 1:nn){
@@ -280,7 +280,7 @@ nm_gen = function(nn, n_i, m_ij, each_s = F, both_s = T, identical_s = T, identi
   }
   
   if(identical_s == F){
-    n = sample(c(3, 150, rep(n_i, (nn-2))))
+    n = sample(c(3, 25, rep(n_i, (nn-2))))
     m = list()
     if(identical_c == T){
       for(i in 1:nn){
@@ -289,7 +289,7 @@ nm_gen = function(nn, n_i, m_ij, each_s = F, both_s = T, identical_s = T, identi
       
     } else if(identical_c == F){
       m_small = 3
-      m_large = 40
+      m_large = 15
       if(each_s == F) other = sample(c(1:nn), 2)
       if(each_s == T) other = list(c(1:nn))
       for(i in 1:nn){
