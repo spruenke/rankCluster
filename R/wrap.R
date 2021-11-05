@@ -146,7 +146,7 @@ q_anova = function(n, data, cont, f_2, theta = NULL, psi = NULL, alpha = 0.05){
 #' @param psi A list of vectors with the cluster weights, defaults to unweighted estimator
 #' @param alpha The significance level, defaults to 0.05
 #' @return A list containing the value of the test statistic, the degrees of freedom and the test decision
-max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha){
+max_T_old  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha){
   Sigma = sigma_est(n, data, theta = theta, psi = psi)
   p = rel_eff(data, theta, psi)
   R = cov2cor(Sigma)
@@ -170,7 +170,7 @@ max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi
 #' @param psi A list of vectors with the cluster weights, defaults to unweighted estimator
 #' @param alpha The significance level, defaults to 0.05
 #' @return A list containing the value of the test statistic, the degrees of freedom and the test decision
-max_T2  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha){
+max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha){
   Sigma = sigma_est(n, data, theta = theta, psi = psi)
   p = rel_eff(data, theta, psi)
   R = cov2cor(Sigma)
