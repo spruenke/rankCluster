@@ -57,7 +57,7 @@ rel_eff = function(data, theta = NULL, psi = NULL){
 #' @param n a vector containing the sample sizes for each group
 #' @return Scalar of inflation
 g = function(n){
-  sum(sapply(n, length))
+  sum(n)
 }
 
 #' Computes the Variance-Covariance-Matrix of the relative effects
