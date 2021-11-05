@@ -152,8 +152,8 @@ max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi
   R = cov2cor(Sigma)
   R_c = cov2cor(cont%*%Sigma%*%t(cont))
   stat = sqrt(g(n)) * (p - p_null) / sqrt(diag(Sigma))
-  if(normal == TRUE) crit = mvtnorm::qmvnorm(1-alpha, tail = "lower.tail", mean = rep(0, length(p)), corr = R)$quantile
-  if(normal == FALSE) crit = mvtnorm::qmvt(1-alpha, tail = "lower.tail", df = g(n) - 1, corr = R)$quantile
+  if(normal == TRUE) crit = mvtnorm::qmvnorm(1-alpha/2, tail = "lower.tail", mean = rep(0, length(p)), corr = R)$quantile
+  if(normal == FALSE) crit = mvtnorm::qmvt(1-alpha/2, tail = "lower.tail", df = g(n) - 1, corr = R)$quantile
   dec = max(abs(stat)) > crit
   return(list(Statistic = stat, df = g(n) - 1, reject = dec))
 }
@@ -178,7 +178,7 @@ max_T2  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, ps
   stat = sqrt(g(n)) * (p - p_null) / sqrt(diag(Sigma))
   #if(normal == TRUE) crit = mvtnorm::qmvnorm(1-alpha, tail = "lower.tail", mean = rep(0, length(p)), corr = R)$quantile
   #if(normal == FALSE) crit = mvtnorm::qmvt(1-alpha, tail = "lower.tail", df = g(n) - 1, corr = R)$quantile
-  if(normal == FALSE) rej = 1-mvtnorm::pmvt(upper = abs(stat), df = g(n) - 1, corr = R)
+  if(normal == FALSE) rej = 1-mvtnorm::pmvt(upper = abs(stat), df = sqrt(g(n) - 1), corr = R)
   #dec = max(abs(stat)) > crit
   #return(list(Statistic = stat, df = g(n) - 1, reject = dec))
   dec = rej <= alpha
