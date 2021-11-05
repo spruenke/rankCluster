@@ -181,7 +181,7 @@ max_T2  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, ps
   if(normal == FALSE) rej = 1-mvtnorm::pmvt(upper = abs(stat), df = g(n) - 1, corr = R)
   #dec = max(abs(stat)) > crit
   #return(list(Statistic = stat, df = g(n) - 1, reject = dec))
-  dec = rej <= alpha/2
+  dec = rej <= alpha
   return(list(Statistic = stat, df = g(n) - 1, reject = dec))
 }
 
