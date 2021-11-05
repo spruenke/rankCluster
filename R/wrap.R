@@ -178,7 +178,7 @@ max_T2  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, ps
   stat = sqrt(g(n)) * (p - p_null) / sqrt(diag(Sigma))
   #if(normal == TRUE) crit = mvtnorm::qmvnorm(1-alpha, tail = "lower.tail", mean = rep(0, length(p)), corr = R)$quantile
   #if(normal == FALSE) crit = mvtnorm::qmvt(1-alpha, tail = "lower.tail", df = g(n) - 1, corr = R)$quantile
-  if(normal == FALSE) rej = 1-mvtnorm::pmvt(upper = rep(max(abs(stat)), nrow(R)), df = round(sqrt(g(n) - 1)), corr = R)
+  if(normal == FALSE) rej = 1-mvtnorm::pmvt(upper = rep(max(abs(stat)), nrow(R)), df = g(n) - 1, corr = R, keepAttr = F)
   #dec = max(abs(stat)) > crit
   #return(list(Statistic = stat, df = g(n) - 1, reject = dec))
   dec = rej <= alpha/2
