@@ -225,7 +225,7 @@ h_0_f = function(n = rep(5, 5), m = NULL, dist = "norm", corstruct = "independen
              for(j in 1:length(m[[i]])){
                R           = matrix(rho, nrow = m[[i]][j], ncol = m[[i]][j])
                diag(R)     = rep(1, nrow(R))
-               copu        = copula::mvdc(copula = copula::normalCopula(P2p(R), dim = m[[i]][j], dispstr = "un"), margins = rep(dist, m[[i]][j]), paramMargins = rep(list(params), m[[i]][j]))
+               copu        = copula::mvdc(copula = copula::normalCopula(copula::P2p(R), dim = m[[i]][j], dispstr = "un"), margins = rep(dist, m[[i]][j]), paramMargins = rep(list(params), m[[i]][j]))
                l[[i]][[j]] = copula::rMvdc(1, copu)
              }
            }
