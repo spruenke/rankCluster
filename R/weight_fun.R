@@ -5,10 +5,12 @@
 #' @return A list of vectors with the weights.
 weight_fun = function(data, type = "unweighted"){
   psi = list()
+  theta = numeric(length(data))
   if(type == "unweighted" || type == "u"){
     for(i in 1:length(data)){
       psi[[i]] = rep(1 / length(data[[i]]), length(data[[i]]))
     }
+    theta = rep(1/length(data), length(data))
   }
   if(type == "weighted" || type == "w"){
     for(i in 1:length(data)){
@@ -16,6 +18,9 @@ weight_fun = function(data, type = "unweighted"){
         length(x) / sum(sapply(data[[i]], length))
       }) 
     }
+    theta = sapply(data, FUN = function(x){
+      length(x) / sum(sapply(data, length))
+    })
   }
-  return(psi)
+  return(list("theta" = theta, "psi" = psi))
 }
