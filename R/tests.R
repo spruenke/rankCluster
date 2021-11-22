@@ -6,15 +6,18 @@
 #' @param theta A Vector for the group weights, defaults to unweighted estimator
 #' @param psi A list of vectors with the cluster weights, defaults to unweighted estimator
 #' @param alpha The significance level, defaults to 0.05
+#' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A list containing the value of the test statistic, the degrees of freedom, the p-value and the test decision
-q_wald = function(n, data, cont, theta = NULL, psi = NULL, alpha = 0.05){
-  if(is.null(psi)){
-    psi = list()
-    for(i in 1:length(data)){
-      psi[[i]] = rep(1 / length(data[[i]]), length(data[[i]]))
-    }
+q_wald = function(n, data, cont, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
+  if(is.null(theta)){
+    if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
+    theta = weight_fun(data, type)$theta
+  } #theta = rep(1/length(data), length(data))
+  # If psi is not provided create it
+  if(is.null(psi)) {
+    if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
+    psi = weight_fun(data, type)$psi
   }
-  if(is.null(theta)) theta = rep(1/length(data), length(data))
   st   = .q_wald_arma(n, data, theta, psi, cont)
   stat = g(n) * st[[1]]
   #df   = Matrix::rankMatrix(cont%*%Sigma)
@@ -34,15 +37,18 @@ q_wald = function(n, data, cont, theta = NULL, psi = NULL, alpha = 0.05){
 #' @param theta A Vector for the group weights, defaults to unweighted estimator
 #' @param psi A list of vectors with the cluster weights, defaults to unweighted estimator
 #' @param alpha The significance level, defaults to 0.05
+#' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A list containing the value of the test statistic, the degrees of freedom, the p-value and the test decision
-q_anova = function(n, data, cont, f_2, theta = NULL, psi = NULL, alpha = 0.05){
-  if(is.null(psi)){
-    psi = list()
-    for(i in 1:length(data)){
-      psi[[i]] = rep(1 / length(data[[i]]), length(data[[i]]))
-    }
+q_anova = function(n, data, cont, f_2, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
+  if(is.null(theta)){
+    if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
+    theta = weight_fun(data, type)$theta
+  } #theta = rep(1/length(data), length(data))
+  # If psi is not provided create it
+  if(is.null(psi)) {
+    if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
+    psi = weight_fun(data, type)$psi
   }
-  if(is.null(theta)) theta = rep(1/length(data), length(data))
   st   = .q_anova_arma(n, data, theta, psi, cont)
   stat =  st[[1]]  * g(n)
   #df   = c(sum(diag(M%*%Sigma))^2 / sum(diag(M%*%Sigma%*%M%*%Sigma)), f_2)
@@ -64,8 +70,18 @@ q_anova = function(n, data, cont, f_2, theta = NULL, psi = NULL, alpha = 0.05){
 #' @param theta A Vector for the group weights, defaults to unweighted estimator
 #' @param psi A list of vectors with the cluster weights, defaults to unweighted estimator
 #' @param alpha The significance level, defaults to 0.05
+#' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A list containing the value of the test statistic, the degrees of freedom and the test decision
-max_T_old  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha){
+max_T_old  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha, type = NULL){
+  if(is.null(theta)){
+    if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
+    theta = weight_fun(data, type)$theta
+  } #theta = rep(1/length(data), length(data))
+  # If psi is not provided create it
+  if(is.null(psi)) {
+    if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
+    psi = weight_fun(data, type)$psi
+  }
   Sigma = sigma_est(n, data, theta = theta, psi = psi)
   p = rel_eff(data, theta, psi)
   R = cov2cor(Sigma)
@@ -88,8 +104,18 @@ max_T_old  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL,
 #' @param theta A Vector for the group weights, defaults to unweighted estimator
 #' @param psi A list of vectors with the cluster weights, defaults to unweighted estimator
 #' @param alpha The significance level, defaults to 0.05
+#' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A list containing the value of the test statistic, the degrees of freedom and the test decision
-max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha){
+max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha, type = NULL){
+  if(is.null(theta)){
+    if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
+    theta = weight_fun(data, type)$theta
+  } #theta = rep(1/length(data), length(data))
+  # If psi is not provided create it
+  if(is.null(psi)) {
+    if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
+    psi = weight_fun(data, type)$psi
+  }
   Sigma = sigma_est(n, data, theta = theta, psi = psi)
   p = rel_eff(data, theta, psi)
   R = cov2cor(Sigma)
