@@ -212,7 +212,7 @@ nm_gen2 = function(nn, n_i, m_ij, each_s = F, both_s = T, identical_s = T, ident
     m = list()
     if(identical_c == T){
       for(i in 1:nn){
-        m[[i]] = rep(m_ij, n_i)
+        m[[i]] = rep(m_ij, n[i])
       }
       
     } else if(identical_c == F){
