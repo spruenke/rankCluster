@@ -18,10 +18,10 @@ q_wald = function(n, data, cont, theta = NULL, psi = NULL, alpha = 0.05, type = 
     if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
     psi = weight_fun(data, type)$psi
   }
-  st   = .q_wald_arma(n, data, theta, psi, cont)
-  stat = g(n) * st[[1]]
-  #df   = Matrix::rankMatrix(cont%*%Sigma)
-  df   = st[[2]]
+  phat = rel_eff(data, theta, psi)
+  sigma = sigma_est(n, data, theta, psi)
+  stat = (t(phat) %*% t(c_mat) %*% MASS::ginv(c_mat %*% sigma %*% t(c_mat)) %*% c_mat %*% phat)  * g(sizes[[1]])
+  df = Matrix::rankMatrix(c_mat %*% sigma)
   pv   = 1 - pchisq(stat, df)
   dec  = pv < alpha
   return(list(Statistic = stat, df = df, p.value = pv, reject = dec))
@@ -49,10 +49,13 @@ q_anova = function(n, data, cont, f_2, theta = NULL, psi = NULL, alpha = 0.05, t
     if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
     psi = weight_fun(data, type)$psi
   }
-  st   = .q_anova_arma(n, data, theta, psi, cont)
-  stat =  st[[1]]  * g(n)
-  #df   = c(sum(diag(M%*%Sigma))^2 / sum(diag(M%*%Sigma%*%M%*%Sigma)), f_2)
-  df   = c(st[[2]], f_2)
+  phat = rankCluster::rel_eff(data, theta, psi)
+  sigma = sigma_est_r(n, data, theta, psi)
+  M = t(c_mat) %*% MASS::ginv(c_mat %*% t(c_mat)) %*% c_mat
+  nen = sum(diag(M %*% sigma))
+  stat = t(phat) %*% M %*% phat / nen * g(n)
+  df_1  = sum(diag(M * sigma))^2 / sum(diag(M * sigma * M * sigma))
+  df   = c(df_1, f_2)
   crit = qf(1-alpha, df[1], df[2])
   pv   = 1 - pf(stat, df[1], df[2])
   dec = stat > crit
