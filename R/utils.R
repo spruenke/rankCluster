@@ -71,7 +71,7 @@ g = function(n){
 }
 
 
-y_abc = function(x_ab, c, data){
+.y_abc = function(x_ab, c, data){
   subdata = data[[c]]
   Fcx = numeric(length(x_ab))
   for(k in 1:length(x_ab)){
@@ -105,12 +105,12 @@ y_abc = function(x_ab, c, data){
           ind = c(1:length(data))[-i]
           y = numeric(length(ind))
           for(s in ind){
-            y[s] = y_abc(data[[i]][[j]], s, data) * theta[s]
+            y[s] = .y_abc(data[[i]][[j]], s, data) * theta[s]
           }
           A_ij[h] = sum(y)
           
         } else if (h != i){
-          A_ij[h] = -1 * theta[i] * y_abc(data[[i]][[j]], h, data) 
+          A_ij[h] = -1 * theta[i] * .y_abc(data[[i]][[j]], h, data) 
         }
         
       }
@@ -132,7 +132,7 @@ y_abc = function(x_ab, c, data){
       A_ibar = A_ibar + psi[[i]][zz] * A_imat[,zz]
     }
     for(j in 1:length(data[[i]])){
-      sigma = sigma + ((A_i_list[[i]][[j]] - A_ibar) %*% t(A_i_list[[i]][[j]] - A_ibar)) /  (kappa_r(psi, i, j))  * psi[[i]][j]^2 
+      sigma = sigma + ((A_i_list[[i]][[j]] - A_ibar) %*% t(A_i_list[[i]][[j]] - A_ibar)) /  (.kappa_r(psi, i, j))  * psi[[i]][j]^2 
     }
   }
   return( sigma * g(n))
