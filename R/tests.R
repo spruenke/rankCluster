@@ -50,7 +50,7 @@ q_anova = function(n, data, cont, f_2, theta = NULL, psi = NULL, alpha = 0.05, t
     psi = weight_fun(data, type)$psi
   }
   phat = rankCluster::rel_eff(data, theta, psi)
-  sigma = sigma_est_r(n, data, theta, psi)
+  sigma = sigma_est(n, data, theta, psi)
   M = t(c_mat) %*% MASS::ginv(c_mat %*% t(c_mat)) %*% c_mat
   nen = sum(diag(M %*% sigma))
   stat = t(phat) %*% M %*% phat / nen * g(n)
