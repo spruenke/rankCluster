@@ -127,9 +127,10 @@ max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi
   #if(normal == TRUE) crit = mvtnorm::qmvnorm(1-alpha, tail = "lower.tail", mean = rep(0, length(p)), corr = R)$quantile
   #if(normal == FALSE) crit = mvtnorm::qmvt(1-alpha, tail = "lower.tail", df = g(n) - 1, corr = R)$quantile
   if(normal == FALSE) rej = 1-mvtnorm::pmvt(upper = rep(max(abs(stat)), nrow(R)), df = g(n) - length(n), corr = R, keepAttr = F)
+  if(normal == TRUE) rej = 1 - mvtnorm::pmvnorm(upper = rep(max(abs(stat)), nrow(R)), sigma = Sigma)
   #dec = max(abs(stat)) > crit
   #return(list(Statistic = stat, df = g(n) - 1, reject = dec))
-  dec = rej <= alpha/2
+  dec = rej <= alpha
   return(list(Statistic = stat, df = g(n) - length(n), reject = dec))
 }
 
