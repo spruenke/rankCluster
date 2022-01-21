@@ -203,13 +203,15 @@ q_comb = function(n, data, p_null = 0.5, cont, normal = FALSE, f_2, theta = NULL
   R = cov2cor(Sigma)
   R_c = cov2cor(cont%*%Sigma%*%t(cont))
   
+  g_n = g(n)
+  
 
 # Wald --------------------------------------------------------------------
 
-  stat_wald = (t(p) %*% t(cont) %*% MASS::ginv(cont %*% Sigma %*% t(cont)) %*% cont %*% p)  * g(n)
+  stat_wald = (t(p) %*% t(cont) %*% MASS::ginv(cont %*% Sigma %*% t(cont)) %*% cont %*% p)  * g_n
   df_wald = Matrix::rankMatrix(cont %*% Sigma)
   pv_wald   = 1 - pchisq(stat_wald, df_wald)
-  dec_wald  = pv < alpha
+  dec_wald  = pv_wald < alpha
   
   
 
@@ -217,19 +219,19 @@ q_comb = function(n, data, p_null = 0.5, cont, normal = FALSE, f_2, theta = NULL
 
   M = t(cont) %*% MASS::ginv(cont %*% t(cont)) %*% cont
   nen = sum(diag(M %*% Sigma))
-  stat_anv = t(p) %*% M %*% p / nen * g(n)
+  stat_anv = t(p) %*% M %*% p / nen * g_n
   f_1  = sum(diag(M * Sigma))^2 / sum(diag(M * Sigma * M * Sigma))
   df_anv   = c(f_1, f_2)
-  pv_anv   = 1 - pf(stat, df[1], df[2])
-  dec_anv = pv < alpha
+  pv_anv   = 1 - pf(stat, df_anv[1], df_anv[2])
+  dec_anv = pv_anv < alpha
   
 
 # Max-T -------------------------------------------------------------------
 
   stat_t = p.adj = numeric(nrow(cont))
   for(i in 1:nrow(cont)){
-    stat_t[i] = sqrt(g(n)) * t(cont[i,]) %*% (p - p_null) * (cont %*% Sigma %*% t(cont))[i,i]^(-0.5)
-    if(normal == FALSE) p.adj[i] = 1 - mvtnorm::pmvt(lower = -abs(stat_t[i]), upper = abs(stat_t[i]), corr = R_c, df = g(n) - length(n), delta = rep(0, nrow(cont)))
+    stat_t[i] = sqrt(g_n) * t(cont[i,]) %*% (p - p_null) * (cont %*% Sigma %*% t(cont))[i,i]^(-0.5)
+    if(normal == FALSE) p.adj[i] = 1 - mvtnorm::pmvt(lower = -abs(stat_t[i]), upper = abs(stat_t[i]), corr = R_c, df = g_n - length(n), delta = rep(0, nrow(cont)))
     if(normal == T) p.adj[i] = 1 - mvtnorm::pmvnorm(lower = -abs(stat_t[i]), upper = abs(stat_t[i]), corr = R_c, mean = rep(0, nrow(cont)))
   }
   
