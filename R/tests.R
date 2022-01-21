@@ -222,7 +222,7 @@ q_comb = function(n, data, p_null = 0.5, cont, normal = FALSE, f_2, theta = NULL
   stat_anv = t(p) %*% M %*% p / nen * g_n
   f_1  = sum(diag(M * Sigma))^2 / sum(diag(M * Sigma * M * Sigma))
   df_anv   = c(f_1, f_2)
-  pv_anv   = 1 - pf(stat, df_anv[1], df_anv[2])
+  pv_anv   = 1 - pf(stat_anv, df_anv[1], df_anv[2])
   dec_anv = pv_anv < alpha
   
 
