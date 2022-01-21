@@ -110,6 +110,36 @@ max_T_old  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL,
 #' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A list containing the value of the test statistic, the degrees of freedom and the test decision
 max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha, type = NULL){
+  # if(is.null(theta)){
+  #   if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
+  #   theta = weight_fun(data, type)$theta
+  # } #theta = rep(1/length(data), length(data))
+  # # If psi is not provided create it
+  # if(is.null(psi)) {
+  #   if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
+  #   psi = weight_fun(data, type)$psi
+  # }
+  # Sigma = sigma_est(n, data, theta = theta, psi = psi)
+  # p = rel_eff(data, theta, psi)
+  # R = cov2cor(Sigma)
+  # R_c = cov2cor(cont%*%Sigma%*%t(cont))
+  # stat = numeric(nrow(cont))
+  # for(i in 1:nrow(cont)){
+  #   stat[i] = sqrt(g(n)) * t(cont[i,]) %*% (p - p_null) * (cont %*% Sigma %*% t(cont))[i,i]^(-0.5)
+  #   
+  # }
+  # #stat =  sqrt(g(n)) * (p - p_null) / sqrt(diag(Sigma))
+  # 
+  # #if(normal == TRUE) crit = mvtnorm::qmvnorm(1-alpha, tail = "lower.tail", mean = rep(0, length(p)), corr = R)$quantile
+  # #if(normal == FALSE) crit = mvtnorm::qmvt(1-alpha, tail = "lower.tail", df = g(n) - 1, corr = R)$quantile
+  # if(normal == FALSE) rej = 1-mvtnorm::pmvt(upper = rep(max(abs(stat)), nrow(R_c)), df = g(n) - length(n), corr = R_c, keepAttr = F)
+  # if(normal == TRUE) rej = 1 - mvtnorm::pmvnorm(upper = rep(max(abs(stat)), nrow(R)), corr = R)
+  # #dec = max(abs(stat)) > crit
+  # #return(list(Statistic = stat, df = g(n) - 1, reject = dec))
+  # dec = rej <= alpha/2
+  # return(list(Statistic = stat, df = g(n) - length(n), reject = dec))
+  
+  
   if(is.null(theta)){
     if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
     theta = weight_fun(data, type)$theta
@@ -123,20 +153,33 @@ max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi
   p = rel_eff(data, theta, psi)
   R = cov2cor(Sigma)
   R_c = cov2cor(cont%*%Sigma%*%t(cont))
-  stat = numeric(nrow(cont))
+  
+  stat = p.adj = numeric(nrow(cont))
   for(i in 1:nrow(cont)){
-    stat[i] = sqrt(g(n)) * t(cont[i,]) %*% (p - p_null) * (t(cont[i,]) %*% Sigma %*% cont[i,])^(-0.5)
-    
+    stat[i] = sqrt(g(n)) * t(cont[i,]) %*% (p - p_null) * (cont %*% Sigma %*% t(cont))[i,i]^(-0.5)
+    if(normal == FALSE) p.adj[i] = 1 - mvtnorm::pmvt(lower = -abs(stat[i]), upper = abs(stat[i]), corr = R_c, df = g(n) - length(n), delta = rep(0, nrow(cont)))
+    if(normal == T) p.adj[i] = 1 - mvtnorm::pmvnorm(lower = -abs(stat[i]), upper = abs(stat[i]), corr = R_c, mean = rep(0, nrow(cont)))
   }
+  
+  # for (pp in 1:nc) {
+  #   p.adj[pp] <- 1 - pmvt(lower = -abs(T[pp]), abs(T[pp]), 
+  #                         corr = rho.bf, df = df.sw, delta = rep(0, nc))
+  # }
+  
+  
+  
   #stat =  sqrt(g(n)) * (p - p_null) / sqrt(diag(Sigma))
   
   #if(normal == TRUE) crit = mvtnorm::qmvnorm(1-alpha, tail = "lower.tail", mean = rep(0, length(p)), corr = R)$quantile
   #if(normal == FALSE) crit = mvtnorm::qmvt(1-alpha, tail = "lower.tail", df = g(n) - 1, corr = R)$quantile
-  if(normal == FALSE) rej = 1-mvtnorm::pmvt(upper = rep(max(abs(stat)), nrow(R)), df = g(n) - length(n), corr = R, keepAttr = F)
-  if(normal == TRUE) rej = 1 - mvtnorm::pmvnorm(upper = rep(max(abs(stat)), nrow(R)), corr = R)
+  
+  #if(normal == FALSE) rej = 1-mvtnorm::pmvt(upper = rep(max(abs(stat)), nrow(R_c)), df = g(n) - length(n), corr = R_c, keepAttr = F)
+  #if(normal == TRUE) rej = 1 - mvtnorm::pmvnorm(upper = rep(max(abs(stat)), nrow(R)), corr = R)
+  
   #dec = max(abs(stat)) > crit
   #return(list(Statistic = stat, df = g(n) - 1, reject = dec))
-  dec = rej <= alpha
+  dec = min(p.adj) <= alpha 
+  #dec = rej <= alpha/2
   return(list(Statistic = stat, df = g(n) - length(n), reject = dec))
 }
 
