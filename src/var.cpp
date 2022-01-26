@@ -34,83 +34,56 @@ double g(arma::vec n){
 }
 
 // [[Rcpp::export(".sigma_est_arma")]]
-arma::mat sigma_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi){
+arma::mat sigma_new(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi){
   int d = n.n_elem;
-  arma::vec ind = arma::regspace(0, (d-1));
-  Rcpp::List A(d);
-  Rcpp::List A_bar(d);
-  Rcpp::List sigma_list(d);
-  for(int i = 0; i < d; i++){
-    int nii = n(i);
-    Rcpp::List sublist(nii);
-    Rcpp::List subdat = data(i);
-    arma::vec psi_i = psi(i);
-    // for(int j = 0; j < nii; j++){
-    //   arma::vec subvec = arma::zeros(d);
-    //   arma::vec subdat_j = subdat[j];
-    //   for(int s = 0; s < d; s++){
-    //     if(s == i){
-    //       arma::vec ind_new = ind(arma::find(ind != s));
-    //       for(unsigned int hh = 0; hh < ind_new.n_elem; hh++){
-    //         unsigned int h = ind_new(hh);
-    //         Rcpp::List dat_h = data[h];
-    //         subvec(s) += theta(h) * arma::sum(f_psi_cpp(subdat_j, dat_h, psi_i)) / subdat_j.n_elem;
-    //       }
-    //     } else {
-    //       subvec(s) = (-1) * theta(s) * arma::sum(f_psi_cpp(subdat_j, data[s], psi_i)) / subdat_j.n_elem;
-    //     }
-    //   }
-    //   sublist(j) = subvec;
-    // }
-    for(int j = 0; j < nii; j++){
-      arma::vec subvec = arma::zeros(d);
-      arma::vec subdat_j = subdat[j];
-      for(int s = 0; s < d; s++){
-        if(s == i){
-          arma::uvec ind_new = arma::find(ind != s);
-          for(unsigned int hh = 0; hh < ind_new.n_elem; hh++){
-            unsigned int h = ind_new(hh);
-            Rcpp::List dat_h = data[h];
-            subvec(s) += theta(h) * Y_abc(subdat_j, data, h);
-          }
-        } else {
-          subvec(s) = (-1) * theta(s) * Y_abc(subdat_j, data, s);
-        }
-      }
-      sublist(j) = subvec;
-    }
-    A(i) = sublist;
-    arma::vec tmp = arma::zeros(d);
-    for(int t = 0; t < d; t++){
-      for(int j = 0; j < sublist.length(); j++){
-        arma::vec A_vec = sublist[j];
-        tmp(t) += A_vec(t) * psi_i(j);
-      }
-    }
-    A_bar(i) = tmp;
-    Rcpp::List sublist2(nii);
-    
-    for(int j = 0; j < sublist.length(); j++){
-      arma::vec A_ij = sublist[j];
-      arma::vec y_lhs = A_ij - tmp;
-      sublist2(j) = y_lhs * y_lhs.t(); // sigma_list[[i]][[j]]
-    }
-    sigma_list(i) = sublist2;
-    
-  }
+  Rcpp::List A_i_list(d);
   
-  // Create sigma matrix
+  for(int i = 0; i < d; i++){
+    Rcpp::List data_i = data(i);
+    int n_i = n(i);
+    Rcpp::List A_ij_list(n_i);
+    for(int j = 0; j < n_i; j++){
+      arma::vec A_ij = arma::zeros(d);
+      arma::vec data_ij = data_i(j);
+      for(int h = 0; h < d; h++){
+        if(h == i){
+          arma::vec ind = arma::regspace(0, d - 1);//
+          arma::vec  y = arma::zeros(d);
+          for(int s = 0; s < d; s++){
+            if(ind(s) != i){
+              y(s) = Y_abc(data_ij, data, s) * theta(s);
+            }
+          }
+          A_ij(h) = arma::sum(y);
+        } else if(h != i){
+          A_ij(h) = (-1) * theta(i) * Y_abc(data_ij, data, h);
+          
+          
+        }  
+        
+      }
+      A_ij_list(j) = A_ij;
+    }
+    A_i_list(i) = A_ij_list;
+  }
+  //return A_i_list;
   arma::mat sigma(d, d, arma::fill::zeros);
   for(int i = 0; i < d; i++){
-    Rcpp::List siglist = sigma_list[i];
-    arma::vec psi_i = psi[i];
-    
-    for(int j = 0; j < siglist.length(); j++){
-      arma::mat subsig = siglist[j];
-      sigma += subsig * (pow(psi_i[j], 2)) / kappa_cpp(psi_i, j);
+    arma::vec A_ibar = arma::zeros(d);
+    Rcpp::List A_i_temp = A_i_list(i);
+    arma::vec psi_i = psi(i);
+    for(int zz = 0; zz < A_i_temp.length(); zz++){
+      arma::vec A_i_z = A_i_temp(zz);
+      A_ibar += psi_i(zz) * A_i_z; //A_i_temp(zz);
     }
+    Rcpp::List data_i = data(i);
+    //     int n_i = data_i.length();
+    int n_i = n(i);
+    for(int j = 0; j < n_i; j++){
+      arma::vec A_ij_temp = A_i_temp(j);
+      sigma += ((A_ij_temp - A_ibar) * (A_ij_temp - A_ibar).t()) / (kappa_cpp(psi_i, j)) * pow(psi_i(j), 2);
+    }
+    //   
   }
-  
-  return g(n) * sigma;
-  // return sigma_list;
+  return sigma * g(n);
 }
