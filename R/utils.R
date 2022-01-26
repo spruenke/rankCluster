@@ -158,7 +158,7 @@ sigma_est = function(n, data, theta = NULL, psi = NULL){
     psi = weight_fun(data, type)$psi
   }
   #return( .sigma_est_arma(n, data, theta, psi))
-  return(.sigma_est_r(n, data, theta, psi))
+  return(.sigma_est_arma(n, data, theta, psi))
 }
 
 
