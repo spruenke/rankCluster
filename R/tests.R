@@ -56,7 +56,7 @@ q_anova = function(n, data, cont, theta = NULL, psi = NULL, alpha = 0.05, type =
   stat = t(phat) %*% M %*% phat / nen * g(n)
   df_1  = sum(diag(M %*% sigma))^2 / sum(diag(M %*% sigma %*% M %*% sigma))
   df_2 = .f_2(.unsize(data), data, theta, psi)
-  df   = c(df_1, f_2)
+  df   = c(df_1, df_2)
   crit = qf(1-alpha, df[1], df[2])
   pv   = 1 - pf(stat, df[1], df[2])
   dec = stat > crit
