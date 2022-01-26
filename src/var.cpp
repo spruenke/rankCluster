@@ -34,7 +34,7 @@ double g(arma::vec n){
 }
 
 // [[Rcpp::export(".sigma_est_arma")]]
-arma::mat sigma_new(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi){
+arma::mat sigma_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi){
   int d = n.n_elem;
   Rcpp::List A_i_list(d);
   
