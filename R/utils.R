@@ -160,3 +160,48 @@ sigma_est = function(n, data, theta = NULL, psi = NULL){
   #return( .sigma_est_arma(n, data, theta, psi))
   return(.sigma_est_r(n, data, theta, psi))
 }
+
+
+
+.s_i2 = function(N, data, i, theta, psi){
+  n = sum(N[[1]])
+  n_i = N[[1]][[i]]
+  r_i_bar = 0
+  r_i_list = lapply(data[[i]], FUN = function(x){
+    n * f_theta(x, data = data, theta = theta, psi = psi) + 0.5}
+  ) # Overall Ranks for group i
+  M_i  = sum(N[[2]][[i]])
+  r_i_int = lapply(data[[i]], FUN = function(x){
+    M_i * f_psi(x, i, data, psi = psi[[i]]) + 0.5}
+  )
+  
+  r_i_bar = sum(sapply(r_i_list, mean) * psi[[i]])
+  mean_diff = numeric(n_i)
+  for(i in 1:n_i){
+    mean_diff[i] = mean(r_i_list[[i]] - r_i_int[[i]])
+  }
+  
+  s_i_sq = sum((mean_diff - r_i_bar + (M_i + 1)/2)^2) / (n_i - 1)
+  return(s_i_sq)
+}
+
+.f_2 = function(N, data, theta, psi){
+  n = sum(N[[1]])
+  n_i = N[[1]]
+  zael = numeric(length(n_i))
+  nen = numeric(length(n_i))
+  for(i in 1:length(n_i)){
+    zael[i] = .s_i2(N, data, i = i, theta, psi) / (n - n_i[i])
+    nen[i]  = (.s_i2(N, data, i = i, theta, psi) / (n - n_i[i]))^2 / (n_i[i] - 1)
+    
+  }
+  res = sum(zael)^2 / sum(nen)
+  return(res)
+}
+
+.unsize = function(data){
+  N = list()
+  N[[1]] = sapply(data, length)
+  N[[2]] = lapply(c(1:length(data)), FUN = function(x) sapply(data[[x]], length))
+  return(N)
+}

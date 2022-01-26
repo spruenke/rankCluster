@@ -39,7 +39,7 @@ q_wald = function(n, data, cont, theta = NULL, psi = NULL, alpha = 0.05, type = 
 #' @param alpha The significance level, defaults to 0.05
 #' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A list containing the value of the test statistic, the degrees of freedom, the p-value and the test decision
-q_anova = function(n, data, cont, f_2, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
+q_anova = function(n, data, cont, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
   if(is.null(theta)){
     if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
     theta = weight_fun(data, type)$theta
@@ -54,7 +54,8 @@ q_anova = function(n, data, cont, f_2, theta = NULL, psi = NULL, alpha = 0.05, t
   M = t(c_mat) %*% MASS::ginv(c_mat %*% t(c_mat)) %*% c_mat
   nen = sum(diag(M %*% sigma))
   stat = t(phat) %*% M %*% phat / nen * g(n)
-  df_1  = sum(diag(M * sigma))^2 / sum(diag(M * sigma * M * sigma))
+  df_1  = sum(diag(M %*% sigma))^2 / sum(diag(M %*% sigma %*% M %*% sigma))
+  df_2 = .f_2(.unsize(data), data, theta, psi)
   df   = c(df_1, f_2)
   crit = qf(1-alpha, df[1], df[2])
   pv   = 1 - pf(stat, df[1], df[2])
@@ -186,7 +187,7 @@ max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi
 
 
 
-q_comb = function(n, data, p_null = 0.5, cont, normal = FALSE, f_2, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
+q_comb = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
   
   
   if(is.null(theta)){
@@ -220,7 +221,8 @@ q_comb = function(n, data, p_null = 0.5, cont, normal = FALSE, f_2, theta = NULL
   M = t(cont) %*% MASS::ginv(cont %*% t(cont)) %*% cont
   nen = sum(diag(M %*% Sigma))
   stat_anv = t(p) %*% M %*% p / nen * g_n
-  f_1  = sum(diag(M * Sigma))^2 / sum(diag(M * Sigma * M * Sigma))
+  f_1  = sum(diag(M %*% Sigma))^2 / sum(diag(M %*% Sigma %*% M %*% Sigma))
+  f_2  = .f_2(.unsize(data), data, theta, psi)
   df_anv   = c(f_1, f_2)
   pv_anv   = 1 - pf(stat_anv, df_anv[1], df_anv[2])
   dec_anv = pv_anv < alpha
