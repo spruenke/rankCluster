@@ -49,7 +49,7 @@ q_anova = function(n, data, cont, theta = NULL, psi = NULL, alpha = 0.05, type =
     if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
     psi = weight_fun(data, type)$psi
   }
-  phat = rankCluster::rel_eff(data, theta, psi)
+  phat = rel_eff(data, theta, psi)
   sigma = sigma_est(n, data, theta, psi)
   M = t(c_mat) %*% MASS::ginv(c_mat %*% t(c_mat)) %*% c_mat
   nen = sum(diag(M %*% sigma))
@@ -181,14 +181,9 @@ q_comb = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi
 
 # Max-T -------------------------------------------------------------------
 
-  stat_t = p.adj = numeric(nrow(cont))
-  for(i in 1:nrow(cont)){
-    stat_t[i] = sqrt(g_n) * t(cont[i,]) %*% (p - p_null) * (cont %*% Sigma %*% t(cont))[i,i]^(-0.5)
-    if(normal == FALSE) p.adj[i] = 1 - mvtnorm::pmvt(lower = -abs(stat_t[i]), upper = abs(stat_t[i]), corr = R_c, df = g_n - length(n), delta = rep(0, nrow(cont)))
-    if(normal == T) p.adj[i] = 1 - mvtnorm::pmvnorm(lower = -abs(stat_t[i]), upper = abs(stat_t[i]), corr = R_c, mean = rep(0, nrow(cont)))
-  }
-  
-  dec_t = min(p.adj) < alpha 
+  stat_t = sqrt(g(n)) * (cont) %*% (p - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
+  pv_t = 1 - mvtnorm::pmvt(lower = -max(abs(stat_t)), upper = max(abs(stat_t)), corr = R_c, df = g(n) - length(n), delta = rep(0, nrow(cont)))
+  dec_t = pv_t < alpha 
   
 
 #   -----------------------------------------------------------------------
