@@ -223,7 +223,7 @@ nm_gen2 = function(nn, n_i, m_ij, each_s = F, both_s = T, identical_s = T, ident
       for(i in 1:nn){
         #if(both_s == T){
         #if(i %in% other[[1]]){
-        m[[i]] = sample(c(m_ij:(m_ij - 3), m_ij:(m_ij + 3)), size = n_i, replace = T)#c(m_small, m_large, rep(m_ij, (n_i-2))))
+        m[[i]] = sample(c(m_ij:(m_ij - 3), m_ij:(m_ij + 3)), size = n[i], replace = T)#c(m_small, m_large, rep(m_ij, (n_i-2))))
         #} else {
         #m[[i]] = rep(m_ij, n_i)
         #}
