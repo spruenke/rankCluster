@@ -67,39 +67,3 @@ arma::vec rel_eff_cpp(Rcpp::List data, arma::vec theta, Rcpp::List psi){
   }
   return p;
 }
-
-//[[Rcpp::export(".ai_est_arma")]]
-Rcpp::List ai_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi){
-  int d = n.n_elem;
-  Rcpp::List A_i_list(d);
-  
-  for(int i = 0; i < d; i++){
-    Rcpp::List data_i = data(i);
-    int n_i = n(i);
-    Rcpp::List A_ij_list(n_i);
-    for(int j = 0; j < n_i; j++){
-      arma::vec A_ij = arma::zeros(d);
-      arma::vec data_ij = data_i(j);
-      for(int h = 0; h < d; h++){
-        if(h == i){
-          arma::vec ind = arma::regspace(0, d - 1);//
-          arma::vec  y = arma::zeros(d);
-          for(int s = 0; s < d; s++){
-            if(ind(s) != i){
-              y(s) = Y_abc(data_ij, data, s) * theta(s);
-            }
-          }
-          A_ij(h) = arma::sum(y);
-        } else if(h != i){
-          A_ij(h) = (-1) * theta(i) * Y_abc(data_ij, data, h);
-          
-          
-        }  
-        
-      }
-      A_ij_list(j) = A_ij;
-    }
-    A_i_list(i) = A_ij_list;
-  }
-  return A_i_list;
-}
