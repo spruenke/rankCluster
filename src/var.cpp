@@ -89,7 +89,7 @@ arma::mat sigma_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::Lis
 }
 
 
-//[[Rcpp::export(".ai_est_arma")]]
+// [[Rcpp::export(".ai_est_arma")]]
 Rcpp::List ai_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi){
   int d = n.n_elem;
   Rcpp::List A_i_list(d);
