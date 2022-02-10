@@ -25,3 +25,7 @@
     .Call(`_rankCluster_sigma_est_cpp`, n, data, theta, psi)
 }
 
+.ai_est_arma <- function(n, data, theta, psi) {
+    .Call(`_rankCluster_ai_est_cpp`, n, data, theta, psi)
+}
+
