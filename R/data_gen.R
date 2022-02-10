@@ -241,3 +241,75 @@ nm_gen2 = function(nn, n_i, m_ij, each_s = F, both_s = T, identical_s = T, ident
   }
   return(list(n, m))
 }
+
+#' Data-generating function under the alternative hypothesis
+#' 
+#' @param n Vector of sample sizes
+#' @param m Vector of cluster sizes, defaults to sample size
+#' @param dist Distribution under the alternative, defaults to normal
+#' @param corstruct Type of correlation (string), defaults to "independent". Alternatives are "exchangeable" and "wild"
+#' @param rho Fixed correlation, defaults to NULL
+#' @param rho.max In case of no fixed correlation, specifies the maximal correlation, defaults to NULL
+#' @param params List of params necessary for the distribution specified in dist, defaults to standard normal
+#' @return Returns a list of lists with the data
+h_1_f = function(n = rep(5, 5), m = NULL, dist = "norm", corstruct = "independent", rho = NULL, rho.max = NULL, params = list(mean = 0, sd = 1)){
+  if(is.null(m)){
+    m = lapply(n, FUN = function(x){
+      return(rep(n, 1))
+    })
+  }
+  switch(corstruct,
+         independent = {
+           l = list()
+           for(i in 1:length(n)){
+             l[[i]] = list()
+             for(j in 1:length(m[[i]])){
+               l[[i]][[j]] = do.call(paste0("r", dist), c(m[[i]][j], (params[[i]])))
+             }
+           }
+         },
+         exchangeable = {
+           if(is.null(rho)){
+             if(is.null(rho.max)){
+               rho = runif(1, 0.05, 0.95)
+             } else {
+               rho = runif(1, 0, rho.max)
+             }
+           }
+           l = list()
+           for(i in 1:length(n)){
+             l[[i]] = list()
+             for(j in 1:length(m[[i]])){
+               R           = matrix(rho, nrow = m[[i]][j], ncol = m[[i]][j])
+               diag(R)     = rep(1, nrow(R))
+               copu        = copula::mvdc(copula = copula::normalCopula(copula::P2p(R), dim = m[[i]][j], dispstr = "un"), margins = rep(dist, m[[i]][j]), paramMargins = rep(list(params[[i]]), m[[i]][j]))
+               l[[i]][[j]] = copula::rMvdc(1, copu)
+             }
+           }
+         },
+         wild = {
+           
+           l = list()
+           for(i in 1:length(n)){
+             l[[i]] = list()
+             for(j in 1:length(m[[i]])){
+               if(is.null(rho)){
+                 if(is.null(rho.max)){
+                   rho = runif(m[[i]][j], 0.05, 0.95)
+                 } else {
+                   rho = runif(m[[i]][j], 0, rho.max)
+                 }
+               }
+               R = rho %*% t(rho)
+               diag(R)     = rep(1, nrow(R))
+               copu        = copula::mvdc(copula = copula::normalCopula(P2p(R), dim = m[[i]][j], dispstr = "un"), margins = rep(dist, m[[i]][j]), paramMargins = rep(list(params[[i]]), m[[i]][j]))
+               l[[i]][[j]] = copula::rMvdc(1, copu)
+             }
+           }
+         }
+         
+         
+  )
+  
+  return(l)
+}

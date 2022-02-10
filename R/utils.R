@@ -205,3 +205,24 @@ sigma_est = function(n, data, theta = NULL, psi = NULL){
   N[[2]] = lapply(c(1:length(data)), FUN = function(x) sapply(data[[x]], length))
   return(N)
 }
+
+
+.df_sw = function(n, data, theta, psi, cont){
+  A_i_list = .ai_est_arma(n, data, theta, psi)
+  psi_sq = sapply(psi, FUN = function(x) sum(x^2))
+  v_list = numeric(nrow(cont))
+  for(l in 1:nrow(cont)){
+    c_l = cont[l,]
+    lambda_list = lapply(A_i_list, FUN = function(x) sapply(x, FUN = function(y) c_l %*% y))
+    lambda_bar  = numeric(length(n))
+    var_i = numeric(length(n))
+    
+    for(i in 1:length(n)){
+      lambda_bar[i] = psi[[i]] %*% lambda_list[[i]]
+      var_i[i] = sum( psi[[i]] * (lambda_list[[i]] - lambda_bar[i])^2 / .kappa_r(psi, i, c(1:length(psi[[i]]))))
+    }
+    v_list[l] = sum( var_i)^2 / sum(var_i^2 / (n-1) )
+    
+  }
+  return(v_list)
+}
