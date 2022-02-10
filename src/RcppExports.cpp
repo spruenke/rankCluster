@@ -11,6 +11,36 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// q_wald_arma
+Rcpp::List q_wald_arma(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, arma::mat cmat);
+RcppExport SEXP _rankCluster_q_wald_arma(SEXP nSEXP, SEXP dataSEXP, SEXP thetaSEXP, SEXP psiSEXP, SEXP cmatSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type psi(psiSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type cmat(cmatSEXP);
+    rcpp_result_gen = Rcpp::wrap(q_wald_arma(n, data, theta, psi, cmat));
+    return rcpp_result_gen;
+END_RCPP
+}
+// q_anova_arma
+Rcpp::List q_anova_arma(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, arma::mat cmat);
+RcppExport SEXP _rankCluster_q_anova_arma(SEXP nSEXP, SEXP dataSEXP, SEXP thetaSEXP, SEXP psiSEXP, SEXP cmatSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type psi(psiSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type cmat(cmatSEXP);
+    rcpp_result_gen = Rcpp::wrap(q_anova_arma(n, data, theta, psi, cmat));
+    return rcpp_result_gen;
+END_RCPP
+}
 // f_psi_cpp
 arma::vec f_psi_cpp(arma::vec x, Rcpp::List data, arma::vec psi);
 RcppExport SEXP _rankCluster_f_psi_cpp(SEXP xSEXP, SEXP dataSEXP, SEXP psiSEXP) {
@@ -65,9 +95,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// q_wald_arma
-Rcpp::List q_wald_arma(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, arma::mat cmat);
-RcppExport SEXP _rankCluster_q_wald_arma(SEXP nSEXP, SEXP dataSEXP, SEXP thetaSEXP, SEXP psiSEXP, SEXP cmatSEXP) {
+// ai_est_cpp
+Rcpp::List ai_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi);
+RcppExport SEXP _rankCluster_ai_est_cpp(SEXP nSEXP, SEXP dataSEXP, SEXP thetaSEXP, SEXP psiSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -75,34 +105,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< Rcpp::List >::type psi(psiSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type cmat(cmatSEXP);
-    rcpp_result_gen = Rcpp::wrap(q_wald_arma(n, data, theta, psi, cmat));
-    return rcpp_result_gen;
-END_RCPP
-}
-// q_anova_arma
-Rcpp::List q_anova_arma(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, arma::mat cmat);
-RcppExport SEXP _rankCluster_q_anova_arma(SEXP nSEXP, SEXP dataSEXP, SEXP thetaSEXP, SEXP psiSEXP, SEXP cmatSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type n(nSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type psi(psiSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type cmat(cmatSEXP);
-    rcpp_result_gen = Rcpp::wrap(q_anova_arma(n, data, theta, psi, cmat));
+    rcpp_result_gen = Rcpp::wrap(ai_est_cpp(n, data, theta, psi));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_rankCluster_q_wald_arma", (DL_FUNC) &_rankCluster_q_wald_arma, 5},
+    {"_rankCluster_q_anova_arma", (DL_FUNC) &_rankCluster_q_anova_arma, 5},
     {"_rankCluster_f_psi_cpp", (DL_FUNC) &_rankCluster_f_psi_cpp, 3},
     {"_rankCluster_f_theta_cpp", (DL_FUNC) &_rankCluster_f_theta_cpp, 4},
     {"_rankCluster_rel_eff_cpp", (DL_FUNC) &_rankCluster_rel_eff_cpp, 3},
     {"_rankCluster_sigma_est_cpp", (DL_FUNC) &_rankCluster_sigma_est_cpp, 4},
-    {"_rankCluster_q_wald_arma", (DL_FUNC) &_rankCluster_q_wald_arma, 5},
-    {"_rankCluster_q_anova_arma", (DL_FUNC) &_rankCluster_q_anova_arma, 5},
+    {"_rankCluster_ai_est_cpp", (DL_FUNC) &_rankCluster_ai_est_cpp, 4},
     {NULL, NULL, 0}
 };
 
