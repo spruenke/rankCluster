@@ -126,7 +126,7 @@ max_T  = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi
   R_c = cov2cor(cont%*%Sigma%*%t(cont))
   stat = sqrt(g(n)) * (cont) %*% (p - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
   
-  df_sw = .df_sw(n, data, theta, psi, cont)
+  df_sw = floor(.df_sw(n, data, theta, psi, cont))
   
   p_min = 1 - mvtnorm::pmvt(lower = -max(abs(stat)), upper = max(abs(stat)), corr = R_c, df = df_sw, delta = rep(0, nrow(cont)))
   
@@ -184,7 +184,7 @@ q_comb = function(n, data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi
 # Max-T -------------------------------------------------------------------
 
   stat_t = sqrt(g(n)) * (cont) %*% (p - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
-  df_t = .df_sw(n, data, theta, psi, cont)
+  df_t = floor(.df_sw(n, data, theta, psi, cont))
   pv_t = 1 - mvtnorm::pmvt(lower = -max(abs(stat_t)), upper = max(abs(stat_t)), corr = R_c, df = df_t, delta = rep(0, nrow(cont)))
   dec_t = pv_t < alpha 
   
