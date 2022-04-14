@@ -2,7 +2,7 @@ Package: rankCluster
 Type: Package
 Title: rankCluster
 Version: 1.0
-Date: 2021-10-19
+Date: 2022-04-14
 Author: Erin Spruenken
 Maintainer: Erin Spruenken <erin-dirk.spruenken@charite.de>
 Description: Non-parametric methods and statistical inference for clustered data. 
@@ -12,7 +12,11 @@ Imports:
   mvtnorm,
   MASS,
   multcomp,
-  copula
+  copula,
+  Matrix
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.1.2
 Encoding: UTF-8
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

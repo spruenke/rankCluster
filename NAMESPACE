@@ -1,3 +1,4 @@
 useDynLib(rankCluster, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
+importFrom("stats", "cov2cor", "pchisq", "pf", "qf")
 exportPattern("^[[:alpha:]]+")

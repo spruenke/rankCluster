@@ -70,84 +70,18 @@ g = function(n){
   sum(n)
 }
 
-
-.y_abc = function(x_ab, c, data){
-  subdata = data[[c]]
-  Fcx = numeric(length(x_ab))
-  for(k in 1:length(x_ab)){
-    x_k = x_ab[k]
-    for(i in 1:length(subdata)){
-      subsubdata = subdata[[i]]
-      Fcx[k] = Fcx[k] + ((length(which(subsubdata < x_k)) + 0.5 * length(which(subsubdata == x_k))) / length(subsubdata))
-    }
-    Fcx[k] = Fcx[k] / length(subdata)
-    
-  }
-  return(mean(Fcx))
-}
-
 .kappa_r = function(psi, i, j){
   return( 1 - 2*psi[[i]][j] + sum(psi[[i]]^2))
 }
 
-
-.sigma_est_r = function(n, data, theta, psi){
-  A_i_list = list()
-  for(i in 1:length(data)){
-    A_ij_list = list()
-    
-    for(j in 1:length(data[[i]])){
-      A_ij = numeric(length(data))
-      for(h in 1:length(data)){
-        
-        if(h == i){
-          ### Create vectors of necessary Y's and theta's
-          ind = c(1:length(data))[-i]
-          y = numeric(length(ind))
-          for(s in ind){
-            y[s] = .y_abc(data[[i]][[j]], s, data) * theta[s]
-          }
-          A_ij[h] = sum(y)
-          
-        } else if (h != i){
-          A_ij[h] = -1 * theta[i] * .y_abc(data[[i]][[j]], h, data) 
-        }
-        
-      }
-      A_ij_list[[j]] = A_ij
-      
-    }
-    #A_ibar[[i]] = rowMeans(do.call("cbind", A_ij_list)) # Mean of A_ij's <=> Careful: Potentially weighted mean with psi instead
-    A_i_list[[i]] = A_ij_list
-  }
-  
-  #####################################
-  ##### Berechnung von den Sigmas #####
-  
-  sigma = matrix(0, length(data), length(data))
-  for(i in 1:length(data)){
-    A_imat = do.call("cbind", A_i_list[[i]])
-    A_ibar = numeric(length(data))
-    for(zz in 1:ncol(A_imat)){
-      A_ibar = A_ibar + psi[[i]][zz] * A_imat[,zz]
-    }
-    for(j in 1:length(data[[i]])){
-      sigma = sigma + ((A_i_list[[i]][[j]] - A_ibar) %*% t(A_i_list[[i]][[j]] - A_ibar)) /  (.kappa_r(psi, i, j))  * psi[[i]][j]^2 
-    }
-  }
-  return( sigma * g(n))
-}
-
-
 #' Computes the Variance-Covariance-Matrix of the relative effects
 #' 
-#' @param n A vector of sample sizes for each group
 #' @param data The data, provided as a list of lists
 #' @param theta A vector containing the group weights, defaults to unweighted estimator
 #' @param psi A list of vector weights for the clusters, defaults to unweighted estimator
 #' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A Variance-Covariance-Matrix
-sigma_est = function(n, data, theta = NULL, psi = NULL){
+sigma_est = function(data, theta = NULL, psi = NULL, type = NULL){
   if(is.null(theta)){
     if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
     theta = weight_fun(data, type)$theta
@@ -158,12 +92,14 @@ sigma_est = function(n, data, theta = NULL, psi = NULL){
     psi = weight_fun(data, type)$psi
   }
   #return( .sigma_est_arma(n, data, theta, psi))
+  n = .unsize(data)[[1]]
   return(.sigma_est_arma(n, data, theta, psi))
 }
 
 
 
-.s_i2 = function(N, data, i, theta, psi){
+.s_i2 = function(data, i, theta, psi){
+  N = .unsize(data)
   n = sum(N[[1]])
   n_i = N[[1]][[i]]
   r_i_bar = 0
@@ -185,14 +121,15 @@ sigma_est = function(n, data, theta = NULL, psi = NULL){
   return(s_i_sq)
 }
 
-.f_2 = function(N, data, theta, psi){
+.f_2 = function(data, theta, psi){
+  N = .unsize(data)
   n = sum(N[[1]])
   n_i = N[[1]]
   zael = numeric(length(n_i))
   nen = numeric(length(n_i))
   for(i in 1:length(n_i)){
-    zael[i] = .s_i2(N, data, i = i, theta, psi) / (n - n_i[i])
-    nen[i]  = (.s_i2(N, data, i = i, theta, psi) / (n - n_i[i]))^2 / (n_i[i] - 1)
+    zael[i] = .s_i2(data, i = i, theta, psi) / (n - n_i[i])
+    nen[i]  = (.s_i2(data, i = i, theta, psi) / (n - n_i[i]))^2 / (n_i[i] - 1)
     
   }
   res = sum(zael)^2 / sum(nen)
@@ -207,7 +144,8 @@ sigma_est = function(n, data, theta = NULL, psi = NULL){
 }
 
 
-.df_sw = function(n, data, theta, psi, cont){
+.df_sw = function(data, theta, psi, cont){
+  n = .unsize(data)[[1]]
   A_i_list = .ai_est_arma(n, data, theta, psi)
   psi_sq = sapply(psi, FUN = function(x) sum(x^2))
   v_list = numeric(nrow(cont))

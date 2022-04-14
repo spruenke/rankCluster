@@ -1,8 +1,6 @@
 #include <RcppArmadillo.h>
+#include "decl.h"
 // [[Rcpp::depends(RcppArmadillo)]]
-
-arma::vec rel_eff_cpp(Rcpp::List, arma::vec, Rcpp::List);
-arma::mat sigma_est_cpp(arma::vec, Rcpp::List, arma::vec, Rcpp::List);
 
 // -- Stats --
 // [[Rcpp::export(".q_wald_arma")]]

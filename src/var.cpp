@@ -1,4 +1,5 @@
 #include <RcppArmadillo.h>
+#include "decl.h"
 // [[Rcpp::depends(RcppArmadillo)]]
 
 double Y_abc(arma::vec x_ab, Rcpp::List data, int c){
@@ -87,7 +88,6 @@ arma::mat sigma_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::Lis
   }
   return sigma * g(n);
 }
-
 
 // [[Rcpp::export(".ai_est_arma")]]
 Rcpp::List ai_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi){

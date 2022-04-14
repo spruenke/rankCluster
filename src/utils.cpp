@@ -1,4 +1,5 @@
 #include <RcppArmadillo.h>
+#include "decl.h"
 // [[Rcpp::depends(RcppArmadillo)]]
 
 // [[Rcpp::export(".f_psi_arma")]]
@@ -67,3 +68,4 @@ arma::vec rel_eff_cpp(Rcpp::List data, arma::vec theta, Rcpp::List psi){
   }
   return p;
 }
+
