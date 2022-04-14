@@ -7,7 +7,7 @@
 #' @param alpha The significance level, defaults to 0.05
 #' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A list containing the value of the test statistic, the degrees of freedom, the p-value and the test decision
-.waldTest = function(data, cont, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
+waldTest = function(data, cont, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
   n = .unsize(data)[[1]]
   if(is.null(theta)){
     if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
@@ -25,7 +25,7 @@
   df = Matrix::rankMatrix(c_mat %*% sigma)
   pv   = 1 - pchisq(stat, df)
   dec  = pv < alpha
-  return(list(Statistic = stat, df = df, p.value = pv, reject = dec))
+  return(list("Statistic" = stat, "df" = df, "p.value" = pv, "reject" = dec))
 }
 
 
@@ -38,7 +38,7 @@
 #' @param alpha The significance level, defaults to 0.05
 #' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A list containing the value of the test statistic, the degrees of freedom, the p-value and the test decision
-.anovaTest = function(data, cont, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
+anovaTest = function(data, cont, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
   n = .unsize(data)[[1]]
   if(is.null(theta)){
     if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
@@ -62,7 +62,7 @@
   pv   = 1 - pf(stat, df[1], df[2])
   dec = stat > crit
   #dec  = pv < alpha
-  return(list(Statistic = stat, df = df, p.value = pv, reject = dec))
+  return(list("Statistic" = stat, "df" = df, "p.value" = pv, "reject" = dec))
 }
 
 
@@ -76,8 +76,8 @@
 #' @param psi A list of vectors with the cluster weights, defaults to unweighted estimator
 #' @param alpha The significance level, defaults to 0.05
 #' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
-#' @return A list containing the value of the test statistic, the degrees of freedom and the test decision
-.mctp  = function(data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha, type = NULL){
+#' @return A list containing the value of the test statistic, the degrees of freedom, the p-values and the test decision
+mctp  = function(data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = NULL, alpha, type = NULL){
   n = .unsize(data)[[1]]
   if(is.null(theta)){
     if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
@@ -92,16 +92,20 @@
   p_hat = rel_eff(data, theta, psi)
   R = cov2cor(Sigma)
   R_c = cov2cor(cont%*%Sigma%*%t(cont))
-  stat = sqrt(g(n)) * (cont) %*% (p_hat - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
   
-  df_sw = floor(.df_sw(data, theta, psi, cont))
+  stat_t = sqrt(g(n)) * (cont) %*% (p - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
+  df_t = floor(.df_sw(data, theta, psi, cont))
   
-  p_min = 1 - mvtnorm::pmvt(lower = -max(abs(stat)), upper = max(abs(stat)), corr = R_c, df = df_sw, delta = rep(0, nrow(cont)))
+  p_vals_t = numeric(nrow(cont))
+  for(i in 1:nrow(cont)){
+    p_vals_t[i] = 1 - mvtnorm::pmvt(lower = -abs(stat_t[i]), upper = abs(stat_t[i]), corr = R_c, df = df_t, delta = rep(0, nrow(cont)))
+  }
   
+  p_vals_mctp = data.frame("p.value" = c(p_vals_t, min(p_vals_t)), row.names = c(row.names(cont), "Overall"))
+  pv_t = min(p_vals_t)
+  dec_t = pv_t < alpha
 
-  dec = p_min <= alpha
-
-  return(list(Statistic = stat, df = g(n) - length(n), reject = dec))
+  return(list("Statistic" = stat_t, "df" = df_t, "p.value" = p_vals_mctp, "reject" = dec_t))
 
 }
 
