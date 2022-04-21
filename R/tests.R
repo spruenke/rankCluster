@@ -14,14 +14,21 @@ waldTest = function(data, cont, theta = NULL, psi = NULL, alpha = 0.05, type = N
     theta = weight_fun(data, type)$theta
   } #theta = rep(1/length(data), length(data))
   # If psi is not provided create it
+  if(is.null(type)) type_fun = "unweighted"
   if(is.null(psi)) {
     if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
     psi = weight_fun(data, type)$psi
   }
+  if((!is.null(psi)) & !(all(lapply(1:length(psi), FUN = function(x){
+    all(psi[[x]] == rep(1 / length(data[[x]]), length(data[[x]])))
+  })) == T)){ type_fun = "weighted" }
+  
+  if(!is.null(type)) type_fun = type
+  if(!(type %in% c("unweighted", "weighted"))) type_fun = "unweighted"
   c_mat = cont
   p_hat = rel_eff(data, theta, psi)
   sigma = sigma_est(data, theta, psi)
-  stat = (t(p_hat) %*% t(c_mat) %*% MASS::ginv(c_mat %*% sigma %*% t(c_mat)) %*% c_mat %*% p_hat)  * g(n)
+  stat = (t(p_hat) %*% t(c_mat) %*% MASS::ginv(c_mat %*% sigma %*% t(c_mat)) %*% c_mat %*% p_hat)  * g(data, type_fun)
   df = Matrix::rankMatrix(c_mat %*% sigma)
   pv   = 1 - pchisq(stat, df)
   dec  = pv < alpha
@@ -43,18 +50,25 @@ anovaTest = function(data, cont, theta = NULL, psi = NULL, alpha = 0.05, type = 
   if(is.null(theta)){
     if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
     theta = weight_fun(data, type)$theta
-  } 
+  } #theta = rep(1/length(data), length(data))
   # If psi is not provided create it
+  if(is.null(type)) type_fun = "unweighted"
   if(is.null(psi)) {
     if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
     psi = weight_fun(data, type)$psi
   }
+  if((!is.null(psi)) & !(all(lapply(1:length(psi), FUN = function(x){
+    all(psi[[x]] == rep(1 / length(data[[x]]), length(data[[x]])))
+  })) == T)){ type_fun = "weighted" }
+  
+  if(!is.null(type)) type_fun = type
+  if(!(type %in% c("unweighted", "weighted"))) type_fun = "unweighted"
   c_mat = cont
   p_hat = rel_eff(data, theta, psi)
   sigma = sigma_est(data, theta, psi)
   M = t(c_mat) %*% MASS::ginv(c_mat %*% t(c_mat)) %*% c_mat
   nen = sum(diag(M %*% sigma))
-  stat = t(p_hat) %*% M %*% p_hat / nen * g(n)
+  stat = t(p_hat) %*% M %*% p_hat / nen * g(data, type_fun)
   df_1  = sum(diag(M %*% sigma))^2 / sum(diag(M %*% sigma %*% M %*% sigma))
   df_2 = .f_2(data, theta, psi)
   df   = c(df_1, df_2)
@@ -84,16 +98,23 @@ mctp  = function(data, p_null = 0.5, cont, normal = FALSE, theta = NULL, psi = N
     theta = weight_fun(data, type)$theta
   } #theta = rep(1/length(data), length(data))
   # If psi is not provided create it
+  if(is.null(type)) type_fun = "unweighted"
   if(is.null(psi)) {
     if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
     psi = weight_fun(data, type)$psi
   }
+  if((!is.null(psi)) & !(all(lapply(1:length(psi), FUN = function(x){
+    all(psi[[x]] == rep(1 / length(data[[x]]), length(data[[x]])))
+  })) == T)){ type_fun = "weighted" }
+  
+  if(!is.null(type)) type_fun = type
+  if(!(type %in% c("unweighted", "weighted"))) type_fun = "unweighted"
   Sigma = sigma_est(data, theta = theta, psi = psi)
   p_hat = rel_eff(data, theta, psi)
   R = cov2cor(Sigma)
   R_c = cov2cor(cont%*%Sigma%*%t(cont))
   
-  stat_t = sqrt(g(n)) * (cont) %*% (p - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
+  stat_t = sqrt(g(data, type_fun)) * (cont) %*% (p - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
   df_t = floor(.df_sw(data, theta, psi, cont))
   
   p_vals_t = numeric(nrow(cont))
@@ -137,16 +158,23 @@ clusterTest = function(data, p_null = 0.5, contrast = NULL, normal = FALSE, thet
     theta = weight_fun(data, type)$theta
   } #theta = rep(1/length(data), length(data))
   # If psi is not provided create it
+  if(is.null(type)) type_fun = "unweighted"
   if(is.null(psi)) {
     if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
     psi = weight_fun(data, type)$psi
   }
+  if((!is.null(psi)) & !(all(lapply(1:length(psi), FUN = function(x){
+    all(psi[[x]] == rep(1 / length(data[[x]]), length(data[[x]])))
+  })) == T)){ type_fun = "weighted" }
+  
+  if(!is.null(type)) type_fun = type
+  if(!(type %in% c("unweighted", "weighted"))) type_fun = "unweighted"
   Sigma = sigma_est(data, theta = theta, psi = psi)
   p = rel_eff(data, theta, psi)
   R = cov2cor(Sigma)
   R_c = cov2cor(cont%*%Sigma%*%t(cont))
   
-  g_n = g(n)
+  g_n = g(data, type_fun)
   
 
 # Wald --------------------------------------------------------------------

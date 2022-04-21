@@ -8,9 +8,9 @@
 
 double Y_abc(arma::vec x_ab, Rcpp::List data, int c);
 double kappa_cpp(arma::vec psi, int j);
-double g(arma::vec n);
+double g(Rcpp::List data, int unw);
 
-arma::mat sigma_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi);
+arma::mat sigma_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, int unw);
 
 Rcpp::List ai_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi);
 
@@ -26,9 +26,9 @@ arma::vec rel_eff_cpp(Rcpp::List data, arma::vec theta, Rcpp::List psi);
 
 // --- Tests
 
-Rcpp::List q_wald_arma(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, arma::mat cmat);
+Rcpp::List q_wald_arma(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, arma::mat cmat, int unw);
 
-Rcpp::List q_anova_arma(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, arma::mat cmat);
+Rcpp::List q_anova_arma(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, arma::mat cmat, int unw);
 
 
 #endif

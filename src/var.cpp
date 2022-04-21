@@ -30,12 +30,27 @@ double kappa_cpp(arma::vec psi, int j){
   return res;
 }
 
-double g(arma::vec n){
-  return arma::sum(n);
+// [[Rcpp::export(".g_cpp")]]
+double g(Rcpp::List data, int unw){
+  if(unw == 1){
+    return data.length();
+  } else {
+    int m;
+    int d = data.length();
+    for(int i = 0; i < d; i++){
+      Rcpp::List subdata = data(i);
+      int n_i = subdata.length();
+      for(int j = 0; j < n_i; j++){
+        arma::vec subsubdata = subdata(j);
+        m += subsubdata.n_elem;
+      }
+    }
+    return m;
+  }
 }
 
 // [[Rcpp::export(".sigma_est_arma")]]
-arma::mat sigma_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi){
+arma::mat sigma_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, int unw){
   int d = n.n_elem;
   Rcpp::List A_i_list(d);
   
@@ -86,7 +101,7 @@ arma::mat sigma_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::Lis
     }
     //   
   }
-  return sigma * g(n);
+  return sigma * g(data, unw);
 }
 
 // [[Rcpp::export(".ai_est_arma")]]

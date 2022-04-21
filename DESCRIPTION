@@ -5,7 +5,7 @@ Version: 1.0
 Date: 2022-04-14
 Author: Erin Spruenken
 Maintainer: Erin Spruenken <erin-dirk.spruenken@charite.de>
-Description: Non-parametric methods and statistical inference for clustered data. 
+Description: Nonparametric methods and statistical inference for clustered data. 
 License: GPL (>= 2)
 Imports: 
   Rcpp (>= 1.0.7),

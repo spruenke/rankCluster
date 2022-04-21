@@ -64,10 +64,11 @@ rel_eff = function(data, theta = NULL, psi = NULL, type = NULL){
 
 #' Inflation-term
 #' 
-#' @param n a vector containing the sample sizes for each group
+#' @param data The data, provided as a list of lists
+#' @param type A string declaring whether a weighted or unweighted estimator will be used, defaults to "unweighted"
 #' @return Scalar of inflation
-g = function(n){
-  sum(n)
+g = function(data, type = "unweighted"){
+  ifelse(type == "unweighted", .g_cpp(data, 1), .g_cpp(data, 0))
 }
 
 .kappa_r = function(psi, i, j){
@@ -82,6 +83,7 @@ g = function(n){
 #' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A Variance-Covariance-Matrix
 sigma_est = function(data, theta = NULL, psi = NULL, type = NULL){
+  if(is.null(type)) unw = 1
   if(is.null(theta)){
     if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
     theta = weight_fun(data, type)$theta
@@ -91,9 +93,15 @@ sigma_est = function(data, theta = NULL, psi = NULL, type = NULL){
     if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
     psi = weight_fun(data, type)$psi
   }
+  if((!is.null(psi)) & !(all(lapply(1:length(psi), FUN = function(x){
+    all(psi[[x]] == rep(1 / length(data[[x]]), length(data[[x]])))
+  })) == T)){ unw = 0 }
+  
+  if(!is.null(type)) unw = ifelse(type == "unweighted", 1, 0)
+  if(!(type %in% c("unweighted", "weighted"))) unw = 1
   #return( .sigma_est_arma(n, data, theta, psi))
   n = .unsize(data)[[1]]
-  return(.sigma_est_arma(n, data, theta, psi))
+  return(.sigma_est_arma(n, data, theta, psi, unw))
 }
 
 

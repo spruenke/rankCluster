@@ -4,10 +4,12 @@
 \alias{g}
 \title{Inflation-term}
 \usage{
-g(n)
+g(data, type = "unweighted")
 }
 \arguments{
-\item{n}{a vector containing the sample sizes for each group}
+\item{data}{The data, provided as a list of lists}
+
+\item{type}{A string declaring whether a weighted or unweighted estimator will be used, defaults to "unweighted"}
 }
 \value{
 Scalar of inflation
