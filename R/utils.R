@@ -93,12 +93,12 @@ sigma_est = function(data, theta = NULL, psi = NULL, type = NULL){
     if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
     psi = weight_fun(data, type)$psi
   }
-  if((!is.null(psi)) & !(all(lapply(1:length(psi), FUN = function(x){
-    all(psi[[x]] == rep(1 / length(data[[x]]), length(data[[x]])))
-  })) == T)){ unw = 0 }
+  # if((!is.null(psi)) & !(all(lapply(1:length(psi), FUN = function(x){
+  #   all(psi[[x]] == rep(1 / length(data[[x]]), length(data[[x]])))
+  # })) == T)){ unw = 0 }
   
   if(!is.null(type)) unw = ifelse(type == "unweighted", 1, 0)
-  if(!(type %in% c("unweighted", "weighted"))) unw = 1
+  #if(!(type %in% c("unweighted", "weighted"))) unw = 1
   #return( .sigma_est_arma(n, data, theta, psi))
   n = .unsize(data)[[1]]
   return(.sigma_est_arma(n, data, theta, psi, unw))
@@ -170,5 +170,5 @@ sigma_est = function(data, theta = NULL, psi = NULL, type = NULL){
     v_list[l] = sum( var_i)^2 / sum(var_i^2 / (n-1) )
     
   }
-  return(v_list)
+  return(max(c(1, min(v_list))))
 }
