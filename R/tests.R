@@ -230,7 +230,7 @@ clusterTest = function(data, p_null = 0.5, contrast = NULL, normal = FALSE, thet
   return(return_list)
 }
 
-clusterTestSim = function(data, p_null = 0.5, contrast = NULL, normal = FALSE, theta = NULL, psi = NULL, alpha = 0.05, type = NULL){
+clusterTestSim = function(data, p_null = 0.5, contrast = NULL, normal = FALSE, theta = NULL, psi = NULL, alpha = 0.05, type = NULL, fisher = T){
   n = .unsize(data)[[1]]
   if(is.null(contrast)) cont = multcomp::contrMat(n, "GrandMean")
   if(is.matrix(contrast)){
@@ -250,7 +250,11 @@ clusterTestSim = function(data, p_null = 0.5, contrast = NULL, normal = FALSE, t
   R_c = cov2cor(cont%*%Sigma%*%t(cont))
   
   g_n = g(data, type)
-  
+  if(length(p_null) == 1){
+    p_nulls = rep(p_null, length(p))
+  } else {
+    p_nulls = p_null
+  }
   
   # Wald --------------------------------------------------------------------
   
@@ -274,9 +278,18 @@ clusterTestSim = function(data, p_null = 0.5, contrast = NULL, normal = FALSE, t
   
   
   # Max-T -------------------------------------------------------------------
-  
-  stat_t = sqrt(g(n)) * (cont) %*% (p - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
-  df_t = floor(.df_sw(data, theta, psi, cont))
+  if(fisher == F){
+    stat_t = sqrt(g(n)) * (cont) %*% (p - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
+    df_t = floor(.df_sw(data, theta, psi, cont))
+    
+  } else if(fisher == T){
+    deltas = as.numeric(cont %*% p)
+    psi_jac = diag((1 - deltas^2)^(-1), nrow(cont))
+    gamma = psi_jac %*% (cont %*% Sigma %*% t(cont)) %*% t(psi_jac)
+    stat_t = sqrt(g(n)) * (link_fun(deltas) - link_fun(as.numeric( cont %*% p_nulls))) * diag(gamma)^(-0.5)
+    df_t = round(.df_sw(data, theta, psi, cont))
+    
+  }
   
   p_vals_t = numeric(nrow(cont))
   for(i in 1:nrow(cont)){

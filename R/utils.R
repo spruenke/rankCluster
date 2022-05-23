@@ -172,3 +172,5 @@ sigma_est = function(data, theta = NULL, psi = NULL, type = NULL){
   }
   return(max(c(1, min(v_list))))
 }
+
+link_fun = function(x){0.5 * log((1 + x) / (1-x))}
