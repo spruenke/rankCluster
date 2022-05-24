@@ -84,7 +84,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // g
-double g(Rcpp::List data, int unw);
+int g(Rcpp::List data, int unw);
 RcppExport SEXP _rankCluster_g(SEXP dataSEXP, SEXP unwSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

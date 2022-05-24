@@ -8,7 +8,7 @@
 
 double Y_abc(arma::vec x_ab, Rcpp::List data, int c);
 double kappa_cpp(arma::vec psi, int j);
-double g(Rcpp::List data, int unw);
+int g(Rcpp::List data, int unw);
 
 arma::mat sigma_est_cpp(arma::vec n, Rcpp::List data, arma::vec theta, Rcpp::List psi, int unw);
 

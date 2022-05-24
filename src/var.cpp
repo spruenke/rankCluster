@@ -31,22 +31,27 @@ double kappa_cpp(arma::vec psi, int j){
 }
 
 // [[Rcpp::export(".g_cpp")]]
-double g(Rcpp::List data, int unw){
+int g(Rcpp::List data, int unw){
+  int d = data.length();
+  int res = 0;
   if(unw == 1){
-    return data.length();
+    for(int i = 0; i < d; i++){
+      Rcpp::List subdata = data(i);
+      int n_i = subdata.length();
+      res += n_i;
+    }
   } else {
-    int m;
-    int d = data.length();
     for(int i = 0; i < d; i++){
       Rcpp::List subdata = data(i);
       int n_i = subdata.length();
       for(int j = 0; j < n_i; j++){
         arma::vec subsubdata = subdata(j);
-        m += subsubdata.n_elem;
+        int m_ij = subsubdata.n_elem;
+        res += m_ij;
       }
     }
-    return m;
   }
+  return res;
 }
 
 // [[Rcpp::export(".sigma_est_arma")]]
