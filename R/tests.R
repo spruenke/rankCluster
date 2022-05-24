@@ -279,14 +279,14 @@ clusterTestSim = function(data, p_null = 0.5, contrast = NULL, normal = FALSE, t
   
   # Max-T -------------------------------------------------------------------
   if(fisher == F){
-    stat_t = sqrt(g(n)) * (cont) %*% (p - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
+    stat_t = sqrt(g_n) * (cont) %*% (p - p_null) * diag((cont %*% Sigma %*% t(cont))^(-0.5))
     df_t = floor(.df_sw(data, theta, psi, cont))
     
   } else if(fisher == T){
     deltas = as.numeric(cont %*% p)
     psi_jac = diag((1 - deltas^2)^(-1), nrow(cont))
     gamma = psi_jac %*% (cont %*% Sigma %*% t(cont)) %*% t(psi_jac)
-    stat_t = sqrt(g(n)) * (link_fun(deltas) - link_fun(as.numeric( cont %*% p_nulls))) * diag(gamma)^(-0.5)
+    stat_t = sqrt(g_n) * (link_fun(deltas) - link_fun(as.numeric( cont %*% p_nulls))) * diag(gamma)^(-0.5)
     df_t = round(.df_sw(data, theta, psi, cont))
     
   }
