@@ -83,7 +83,7 @@ g = function(data, type = "unweighted"){
 #' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A Variance-Covariance-Matrix
 sigma_est = function(data, theta = NULL, psi = NULL, type = NULL){
-  if(is.null(type)) unw = 1
+  if(is.null(type) && is.null(psi)) unw = 1
   if(is.null(theta)){
     if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
     theta = weight_fun(data, type)$theta
@@ -98,6 +98,13 @@ sigma_est = function(data, theta = NULL, psi = NULL, type = NULL){
   # })) == T)){ unw = 0 }
   
   if(!is.null(type)) unw = ifelse(type == "unweighted", 1, 0)
+  if(!is.null(psi)){
+    if(all(round(unlist(psi), 6) == round(unlist(rankCluster::weight_fun(data, "weighted")$psi), 6))){
+      unw = 0
+    } else {
+      unw = 1
+    }
+  }
   #if(!(type %in% c("unweighted", "weighted"))) unw = 1
   #return( .sigma_est_arma(n, data, theta, psi))
   n = .unsize(data)[[1]]
