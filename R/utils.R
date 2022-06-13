@@ -83,28 +83,33 @@ g = function(data, type = "unweighted"){
 #' @param type A string indicating whether weighted or unweighted estimator should be used. Only if psi is not provided
 #' @return A Variance-Covariance-Matrix
 sigma_est = function(data, theta = NULL, psi = NULL, type = NULL){
-  if(is.null(type) && is.null(psi)) unw = 1
-  if(is.null(theta)){
-    if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
-    theta = weight_fun(data, type)$theta
-  } #theta = rep(1/length(data), length(data))
-  # If psi is not provided create it
-  if(is.null(psi)) {
-    if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
-    psi = weight_fun(data, type)$psi
+  # if(is.null(type) && is.null(psi)) unw = 1
+  # if(is.null(theta)){
+  #   if(is.null(type)) theta = weight_fun(data, "unweighted")$theta
+  #   theta = weight_fun(data, type)$theta
+  # } #theta = rep(1/length(data), length(data))
+  # # If psi is not provided create it
+  # if(is.null(psi)) {
+  #   if(is.null(type)) psi = weight_fun(data, "unweighted")$psi
+  #   psi = weight_fun(data, type)$psi
+  # }
+  # # if((!is.null(psi)) & !(all(lapply(1:length(psi), FUN = function(x){
+  # #   all(psi[[x]] == rep(1 / length(data[[x]]), length(data[[x]])))
+  # # })) == T)){ unw = 0 }
+  # 
+   #if(!is.null(type)) unw = ifelse(type == "unweighted", 1, 0)
+  if(type == "unweighted"){
+    unw = 1
+  } else if(type == "weighted"){
+    unw = 0
   }
-  # if((!is.null(psi)) & !(all(lapply(1:length(psi), FUN = function(x){
-  #   all(psi[[x]] == rep(1 / length(data[[x]]), length(data[[x]])))
-  # })) == T)){ unw = 0 }
-  
-  if(!is.null(type) && is.null(psi)) unw = ifelse(type == "unweighted", 1, 0)
-  if(!is.null(psi)){
-    if(all(round(unlist(psi), 6) == round(unlist(rankCluster::weight_fun(data, "weighted")$psi), 6))){
-      unw = 0
-    } else {
-      unw = 1
-    }
-  }
+  # if(!is.null(psi)){
+  #   if(all(round(unlist(psi), 6) == round(unlist(rankCluster::weight_fun(data, "weighted")$psi), 6))){
+  #     unw = 0
+  #   } else {
+  #     unw = 1
+  #   }
+  # }
   #if(!(type %in% c("unweighted", "weighted"))) unw = 1
   #return( .sigma_est_arma(n, data, theta, psi))
   n = .unsize(data)[[1]]
