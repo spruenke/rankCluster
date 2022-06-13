@@ -97,7 +97,7 @@ sigma_est = function(data, theta = NULL, psi = NULL, type = NULL){
   #   all(psi[[x]] == rep(1 / length(data[[x]]), length(data[[x]])))
   # })) == T)){ unw = 0 }
   
-  if(!is.null(type)) unw = ifelse(type == "unweighted", 1, 0)
+  if(!is.null(type) && is.null(psi)) unw = ifelse(type == "unweighted", 1, 0)
   if(!is.null(psi)){
     if(all(round(unlist(psi), 6) == round(unlist(rankCluster::weight_fun(data, "weighted")$psi), 6))){
       unw = 0
