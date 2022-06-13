@@ -244,7 +244,7 @@ clusterTestSim = function(data, p_null = 0.5, contrast = NULL, normal = FALSE, t
   
   theta = weight_fun(data, type)$theta
   psi   = weight_fun(data, type)$psi
-  Sigma = sigma_est(data, theta = theta, psi = psi)
+  Sigma = sigma_est(data, type = type)
   p = rel_eff(data, theta, psi)
   R = cov2cor(Sigma)
   R_c = cov2cor(cont%*%Sigma%*%t(cont))
